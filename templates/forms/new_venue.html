@@ -33,7 +33,7 @@
         {{ form.genres(class_ = 'form-control', placeholder='Genres, separated by commas', autofocus = true) }}
       </div>
       <div class="form-group">
-          <label for="genres">Facebook Link</label>
+          <label for="facebook_link">Facebook Link</label>
           {{ form.facebook_link(class_ = 'form-control', placeholder='http://', autofocus = true) }}
         </div>
       <input type="submit" value="Create Venue" class="btn btn-primary btn-lg btn-block">
@@ -52,6 +52,12 @@
   <script>
     //Create new Venue 
     document.getElementById("form").onsubmit = (e) =>{
+      const genresSelect = document.getElementById("genres").selectedOptions
+      const genres = []
+      for (i of genresSelect) {
+        genres.push(i.value)
+      }
+      console.log(genres)
             e.preventDefault()
             fetch("/venues/create",{
                 method:"POST",
@@ -61,7 +67,7 @@
                     "state": document.getElementById("state").value,
                     "address": document.getElementById("address").value,
                     "phone": document.getElementById("phone").value,
-                    "genres": document.getElementById("genres").value,
+                    "genres": genres,
                     "facebook": document.getElementById("facebook_link").value
                   
                 }),

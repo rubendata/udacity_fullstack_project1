@@ -110,8 +110,6 @@ def venues():
     
     data.append(record)
     
-  
-  
   return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
@@ -232,6 +230,7 @@ def create_venue_submission():
       address = request.get_json()['address']
       phone = request.get_json()['phone']
       genres = request.get_json()['genres']
+      print(genres)
       facebook_link = request.get_json()['facebook']
       venue = Venue(name=name, city=city, state=state, address=address, phone = phone, genres = genres, facebook_link = facebook_link)
       
