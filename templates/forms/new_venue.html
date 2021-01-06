@@ -39,6 +39,16 @@
       <input type="submit" value="Create Venue" class="btn btn-primary btn-lg btn-block">
     </form>
   </div>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+{% block body %}{% endblock %}
   <script>
     //Create new Venue 
     document.getElementById("form").onsubmit = (e) =>{
