@@ -38,6 +38,7 @@ class Venue(db.Model):
     state = db.Column(db.String(120))
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
+    genres = db.Column(db.String(500))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
 
@@ -228,8 +229,8 @@ def create_venue_submission():
     address = request.get_json()['address']
     phone = request.get_json()['phone']
     genres = request.get_json()['genres']
-    facebook = request.get_json()['facebook']
-    venue = Venue(name=name, city=city, state=state, address=address, phone = phone, genres = genres, facebook = facebook)
+    facebook_link = request.get_json()['facebook']
+    venue = Venue(name=name, city=city, state=state, address=address, phone = phone, genres = genres, facebook_link = facebook_link)
       
     db.session.add(venue)
     db.session.commit()
@@ -237,7 +238,7 @@ def create_venue_submission():
   # TODO: modify data to be the data object returned from db insertion
 
   # on successful db insert, flash success
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
+   # flash('Venue ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
