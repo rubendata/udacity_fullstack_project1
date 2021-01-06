@@ -22,6 +22,7 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
+app.secret_key ="dont tel me"
 
 # TODO: connect to a local postgresql database
 
@@ -90,28 +91,28 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
-  return render_template('pages/venues.html', areas=data);
+
+  
+  data = []
+  
+  areas = Venue.query.distinct('city','state').all()
+  for area in areas:
+    venues_filter = Venue.query.filter(Venue.state==area.state,Venue.city==area.city).all()
+    venues = []
+    for venue in venues_filter:
+      venues.append({'id': venue.id, 'name': venue.name})
+
+      record = {
+        'state': area.state,
+        'city': area.city,
+        'venues': venues
+      }
+    
+    data.append(record)
+    
+  
+  
+  return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -243,11 +244,14 @@ def create_venue_submission():
       data["phone"] = venue.phone
       data["genres"] = venue.genres
       data["facebook_link"] = venue.facebook
+      flash('message')
     except:
       db.session.rollback()
     finally:
       db.session.close()
-       
+      flash('message')
+    flash('message')
+    return render_template('pages/home.html')
   # TODO: modify data to be the data object returned from db insertion
   
     # on successful db insert, flash success
@@ -255,10 +259,12 @@ def create_venue_submission():
   # TODO: on unsuccessful db insert, flash an error instead.
    # flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-    return render_template('pages/home.html')
+    
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
+  delte_venue = Venue.query.filter_by(id=venue_id).all()
+  
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
 
