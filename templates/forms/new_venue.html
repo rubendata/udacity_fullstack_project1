@@ -69,13 +69,19 @@
   <script>
     //Create new Venue 
     document.getElementById("form").onsubmit = (e) =>{
+
+      //get multiple select for genres
       const genresSelect = document.getElementById("genres").selectedOptions
       const genres = []
       for (i of genresSelect) {
         genres.push(i.value)
       }
       
-            e.preventDefault()
+      //convert seeking_talent input to boolean
+      let seeking_talent = document.getElementById("seeking_talent").value;
+      (seeking_talent == "Yes") ? seeking_talent=true : seeking_talent=false;
+      console.log(seeking_talent);
+            e.preventDefault();
             fetch("/venues/create",{
                 method:"POST",
                 body:JSON.stringify({
@@ -85,7 +91,11 @@
                     "address": document.getElementById("address").value,
                     "phone": document.getElementById("phone").value,
                     "genres": genres,
-                    "facebook": document.getElementById("facebook_link").value
+                    "facebook": document.getElementById("facebook_link").value,
+                    "image_link": document.getElementById("image_link").value,
+                    "website": document.getElementById("website").value,
+                    "seeking_talent": seeking_talent,
+                    "seeking_description": document.getElementById("seeking_description").value
                   
                 }),
                 headers:{

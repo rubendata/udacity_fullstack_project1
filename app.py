@@ -42,6 +42,9 @@ class Venue(db.Model):
     genres = db.Column(db.String(500))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    website = db.Column(db.String(120))
+    seeking_talent = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String(120))
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -230,9 +233,16 @@ def create_venue_submission():
       address = request.get_json()['address']
       phone = request.get_json()['phone']
       genres = request.get_json()['genres']
-      print(genres)
       facebook_link = request.get_json()['facebook']
-      venue = Venue(name=name, city=city, state=state, address=address, phone = phone, genres = genres, facebook_link = facebook_link)
+      image_link = request.get_json()['image_link']
+      website = request.get_json()['website']
+      seeking_talent = request.get_json()['seeking_talent']
+      seeking_description = request.get_json()['seeking_description']
+      venue = Venue(
+        name=name, city=city, state=state, address=address, phone = phone, 
+        genres = genres, facebook_link = facebook_link, image_link=image_link, website=website,
+        seeking_talent=seeking_talent, seeking_description=seeking_description
+      )
       
       db.session.add(venue)
       db.session.commit()
