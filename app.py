@@ -48,6 +48,7 @@ class Venue(db.Model):
     website = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(120))
+    show = db.relationship('Show', backref="venue_show", lazy=True)
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -65,6 +66,15 @@ class Artist(db.Model):
     website = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(120))
+    show = db.relationship('Show', backref="artist_show", lazy=True)
+
+class Show(db.Model):
+    __tablename__ = 'Show'
+
+    id = db.Column(db.Integer, primary_key=True)
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
     
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
@@ -629,7 +639,7 @@ def shows():
   }]
   return render_template('pages/shows.html', shows=data)
 
-@app.route('/shows/create')
+@app.route('/shows/create') #nothing to do
 def create_shows():
   # renders form. do not touch.
   form = ShowForm()
@@ -637,6 +647,19 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
+  data = {}
+  try:
+    venue_id = request.get_json()['venue_id']
+    artist_id = request.get_json()['artist_id']
+    start_time = request.get_json()['start_time']
+    show = Show(venue_id=venue_id, artist_id=artist_id, start_time=start_time)
+    db.session.add(show)
+    db.session.commit()
+  except:
+    db.session.rollback()
+  finally:
+    db.session.close()
+
   # called to create new shows in the db, upon submitting new show listing form
   # TODO: insert form data as a new Show record in the db, instead
 
