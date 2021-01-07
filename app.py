@@ -93,7 +93,7 @@ def index():
 #  Venues
 #  ----------------------------------------------------------------
 
-@app.route('/venues')
+@app.route('/venues') #fertig außer num_shows fehlt noch
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
@@ -133,7 +133,7 @@ def search_venues():
   }
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
-@app.route('/venues/<int:venue_id>')
+@app.route('/venues/<int:venue_id>') # fertig aber shows fehlen noch
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
@@ -214,18 +214,39 @@ def show_venue(venue_id):
     "past_shows_count": 1,
     "upcoming_shows_count": 1,
   }
-  data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
+
+  data_array = []
+
+  venues = Venue.query.all()
+  for venue in venues:
+    record = {
+      'id': venue.id,
+      'name': venue.name,
+      'genres': venue.genres,
+      'address': venue.address,
+      'city': venue.city,
+      'state': venue.state,
+      'phone': venue.phone,
+      'website': venue.website,
+      'facebook_link': venue.facebook_link,
+      "seeking_talent": venue.seeking_talent,
+      "seeking_description": venue.seeking_description,
+      "image_link": venue.image_link
+    }
+    data_array.append(record)
+
+  data = list(filter(lambda d: d['id'] == venue_id, data_array))[0]
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
 #  ----------------------------------------------------------------
 
-@app.route('/venues/create', methods=['GET'])
+@app.route('/venues/create', methods=['GET']) #nothing to do
 def create_venue_form():
   form = VenueForm()
   return render_template('forms/new_venue.html', form=form)
 
-@app.route('/venues/create', methods=['POST'])
+@app.route('/venues/create', methods=['POST']) #fertig
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
     data = {}
@@ -273,7 +294,7 @@ def create_venue_submission():
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/venues/<venue_id>', methods=['DELETE']) #fertig
 def delete_venue(venue_id):
   delete_venue = Venue.query.filter_by(id=venue_id).first()
   try:
