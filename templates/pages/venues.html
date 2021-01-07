@@ -18,8 +18,8 @@
 	</ul>
 {% endfor %}
 <script>
+	//Delete button
 	const buttons = document.getElementsByClassName("button");
-	
 	for (button of buttons) {
 		button.addEventListener("click", (e) => {
 			deleteId=e.target.id;
@@ -36,6 +36,13 @@
                     
                 })
             })
+	}
+
+	const search = document.getElementsByClassName("search")
+	console.log(search)
+	search.onsubmit = (e) => {
+		e.preventDefault()
+		console.log(e.value)
 	}
 </script>
 {% endblock %}
