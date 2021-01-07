@@ -110,6 +110,12 @@ ul.items > li > a {
 ul.items > li > a > i {
   padding: 7px 10px 0;
 }
+
+li {
+   display: flex;
+   align-items: flex-start;
+}
+
 ul.items > li:hover {
   color: orange;
   cursor: pointer;
@@ -119,7 +125,6 @@ ul.items > li:hover h5 {
 }
 .item {
   padding: 5px 5px 5px;
-  flex: 1;
 }
 .item h5 {
   margin-top: 0;
@@ -208,4 +213,15 @@ h2.monospace {
 }
 .subtitle {
   opacity: 0.5;
+}
+
+.button {
+  outline: none;
+  color: red;
+  border: none;
+  background-color: transparent;
+  float: right;
+  font-size: 20px;
+  cursor: pointer;
+  vertical-align: top;
 }
