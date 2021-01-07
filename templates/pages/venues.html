@@ -12,9 +12,31 @@
 					<h5>{{ venue.name }}</h5>
 				</div>
 			</a>
-			<button class="button">&cross;</button>
+			<button class="button" id="{{ venue.id }}">&cross;</button>
 		</li>
 		{% endfor %}
 	</ul>
 {% endfor %}
+<script>
+	const buttons = document.getElementsByClassName("button");
+	
+	for (button of buttons) {
+		button.addEventListener("click", (e) => {
+			deleteId=e.target.id;
+			fetch("/venues/"+deleteId,{
+                    method: "DELETE",
+                    
+                    headers:{
+                        "Content-Type": "application/json"
+                    }
+                    
+                })
+                .then((response) => {
+                    console.log(response)
+                    
+                })
+            })
+	}
+</script>
 {% endblock %}
+

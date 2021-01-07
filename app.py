@@ -20,9 +20,12 @@ from flask_migrate import Migrate
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
+app.config['FLASK_ENV']='development'
+app.config['DEBUG']=True
+app.config['FLASK_DEBUG']=True
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
-app.secret_key ="dont tel me"
 
 # TODO: connect to a local postgresql database
 
@@ -272,14 +275,22 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-  delte_venue = Venue.query.filter_by(id=venue_id).all()
+  delete_venue = Venue.query.filter_by(id=venue_id).first()
+  try:
+    db.session.delete(delete_venue)
+    db.session.commit()
+  except:
+        db.session.rollback()
+  finally:
+        db.session.close()
+  
   
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  return render_template('pages/venues.html')
 
 #  Artists
 #  ----------------------------------------------------------------
