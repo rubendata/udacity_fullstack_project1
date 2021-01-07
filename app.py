@@ -62,6 +62,10 @@ class Artist(db.Model):
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    website = db.Column(db.String(120))
+    seeking_venue = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String(120))
+    
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -295,6 +299,10 @@ def create_venue_submission():
       data["phone"] = venue.phone
       data["genres"] = venue.genres
       data["facebook_link"] = venue.facebook
+      data["image_link"] = venue.image_link
+      data["website"] = venue.website
+      data["image_link"] = venue.seeking_talent
+      data["image_link"] = venue.seeking_description
       flash('message')
     except:
       db.session.rollback()
@@ -505,15 +513,56 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
+
+    data = {}
+    try:
+      name = request.get_json()['name']
+      city = request.get_json()['city']
+      state = request.get_json()['state']
+      #address = request.get_json()['address']
+      phone = request.get_json()['phone']
+      genres = request.get_json()['genres']
+      facebook_link = request.get_json()['facebook']
+      image_link = request.get_json()['image_link']
+      website = request.get_json()['website']
+      seeking_venue = request.get_json()['seeking_venue']
+      seeking_description = request.get_json()['seeking_description']
+      artist = Artist(
+        name=name, city=city, state=state, phone = phone, 
+        genres = genres, facebook_link = facebook_link, image_link=image_link,
+        website = website, seeking_venue = seeking_venue, seeking_description=seeking_description)
+      
+      db.session.add(artist)
+      db.session.commit()
+      data["name"] = artist.name
+      data["city"] = artist.city
+      data["state"] = artist.state
+      #data["address"] = venue.address
+      data["phone"] = artist.phone
+      data["genres"] = artist.genres
+      data["facebook_link"] = artist.facebook_link
+      data["image_link"] = artist.image_link
+      data["website"] = artist.website
+      data["seeking_venue"] = artist.seeking_venue
+      data["seeking_description"] = artist.seeking_description
+      flash('Artist ' + request.form['name'] + ' was successfully listed!')
+    except:
+      db.session.rollback()
+    finally:
+      db.session.close()
+      
+    
+    return render_template('pages/home.html')
+
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
 
   # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
+  
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+  
 
 
 #  Shows
