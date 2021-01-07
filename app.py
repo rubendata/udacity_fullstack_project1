@@ -371,7 +371,7 @@ def search_artists():
   }
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
-@app.route('/artists/<int:artist_id>')
+@app.route('/artists/<int:artist_id>') #fertig aber shows fehlt
 def show_artist(artist_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
@@ -446,7 +446,27 @@ def show_artist(artist_id):
     "past_shows_count": 0,
     "upcoming_shows_count": 3,
   }
-  data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
+
+  data_array = []
+
+  artists = Artist.query.all()
+  for artist in artists:
+    record = {
+      'id': artist.id,
+      'name': artist.name,
+      'genres': artist.genres,
+      'city': artist.city,
+      'state': artist.state,
+      'phone': artist.phone,
+      'website': artist.website,
+      'facebook_link': artist.facebook_link,
+      "seeking_venue": artist.seeking_venue,
+      "seeking_description": artist.seeking_description,
+      "image_link": artist.image_link
+    }
+    data_array.append(record)
+
+  data = list(filter(lambda d: d['id'] == artist_id, data_array))[0]
   return render_template('pages/show_artist.html', artist=data)
 
 #  Update
@@ -506,12 +526,12 @@ def edit_venue_submission(venue_id):
 #  Create Artist
 #  ----------------------------------------------------------------
 
-@app.route('/artists/create', methods=['GET'])
+@app.route('/artists/create', methods=['GET']) #nothing to do
 def create_artist_form():
   form = ArtistForm()
   return render_template('forms/new_artist.html', form=form)
 
-@app.route('/artists/create', methods=['POST'])
+@app.route('/artists/create', methods=['POST']) #fertig
 def create_artist_submission():
 
     data = {}
@@ -537,7 +557,6 @@ def create_artist_submission():
       data["name"] = artist.name
       data["city"] = artist.city
       data["state"] = artist.state
-      #data["address"] = venue.address
       data["phone"] = artist.phone
       data["genres"] = artist.genres
       data["facebook_link"] = artist.facebook_link
