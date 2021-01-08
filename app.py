@@ -133,40 +133,38 @@ def venues():
     
   return render_template('pages/venues.html', areas=data)
 
-@app.route('/venues/search', methods=['POST']) #fertig aber shows fehlen noch
+@app.route('/venues/search', methods=['POST']) #completed
 def search_venues():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
+
   search_term = request.form.get('search_term', '')
-  #print(search_term)
-  search_query = Venue.query.filter(Venue.name.like('%'+search_term+'%')).all()
+  search_query = db.session.query(Venue).filter(Venue.name.like('%'+search_term+'%')).all()
+  venue_id = search_query[0].id
+  join = db.session.query(Venue, Show).join(Show).filter(Venue.id == venue_id).all()
+  
   data=[]
-  for i in search_query:
-    #print(i.name)
-    record = {
-      "id": i.id,
-      "name": i.name,
-      #"num_upcoming_shows": len(i.upcoming_shows)
-    }
-    data.append(record)
+  num_upcoming_shows = 0
+  for venue, show in join:
+    if show.start_time > datetime.utcnow():
+      num_upcoming_shows += 1
+  print(num_upcoming_shows)
+  record = {
+    "id": venue.id,
+    "name": venue.name,
+    "num_upcoming_shows": num_upcoming_shows
+  }
+  data.append(record)
 
   response={
     "count": len(search_query),
     "data": data
   }
 
-  #response1={
-  #  "count": 1,
-  #  "data": [{
-  #    "id": 2,
-  #    "name": "The Dueling Pianos Bar",
-  #    "num_upcoming_shows": 0,
-  #  }]
-  #}
   return render_template('pages/search_venues.html', results=response, search_term=search_term)
 
-@app.route('/venues/<int:venue_id>') # fertig aber shows fehlen noch
+@app.route('/venues/<int:venue_id>') # completed
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
