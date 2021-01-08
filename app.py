@@ -86,7 +86,7 @@ class Show(db.Model):
 # Filters.
 #----------------------------------------------------------------------------#
 
-def format_datetime(value, format='medium'):
+def format_datetime(value, format='medium'): #nothing to do
   date = dateutil.parser.parse(value)
   if format == 'full':
       format="EEEE MMMM, d, y 'at' h:mma"
@@ -100,7 +100,7 @@ app.jinja_env.filters['datetime'] = format_datetime
 # Controllers.
 #----------------------------------------------------------------------------#
 
-@app.route('/')
+@app.route('/') #nothing to do
 def index():
   return render_template('pages/home.html')
 
@@ -108,7 +108,7 @@ def index():
 #  Venues
 #  ----------------------------------------------------------------
 
-@app.route('/venues') #fertig außer num_shows fehlt noch
+@app.route('/venues') #completed
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
@@ -122,14 +122,11 @@ def venues():
     
     for venue in venues_filter:
       join = db.session.query(Venue, Show).join(Show).filter(Venue.id==venue.id).all()
-      
-        
-    
       venues.append({
-        'id': venue.id, 
-        'name': venue.name,
-        'num_upcoming_shows': len(join)
-        })
+      'id': venue.id, 
+      'name': venue.name,
+      'num_upcoming_shows': len(join)
+      })
 
     record = {
       'state': area.state,
@@ -138,8 +135,7 @@ def venues():
     }
 
     data.append(record)
-    print(data)
-    
+     
   return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST']) #completed
@@ -589,7 +585,7 @@ def create_artist_form():
   form = ArtistForm()
   return render_template('forms/new_artist.html', form=form)
 
-@app.route('/artists/create', methods=['POST']) #fertig
+@app.route('/artists/create', methods=['POST']) #completed
 def create_artist_submission():
 
     data = {}
@@ -645,7 +641,7 @@ def create_artist_submission():
 #  Shows
 #  ----------------------------------------------------------------
 
-@app.route('/shows')
+@app.route('/shows') #completed
 def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
@@ -677,7 +673,7 @@ def create_shows():
   form = ShowForm()
   return render_template('forms/new_show.html', form=form)
 
-@app.route('/shows/create', methods=['POST']) #fertig
+@app.route('/shows/create', methods=['POST']) #completed
 def create_show_submission():
   data = {}
   try:
