@@ -13,6 +13,7 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
+from datetime import datetime
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -251,6 +252,22 @@ def show_venue(venue_id):
 
   venues = Venue.query.all()
   for venue in venues:
+    #get every artist, join the venue information to the show information for this artist
+    upcoming_shows = []
+    past_shows = []
+    shows = db.session.query(Show, Artist).join(Artist).filter(Show.venue_id == venue.id).all()
+    for show, artist in shows:
+      artist = {
+        "artist_id": artist.id,
+        "artist_name": artist.name,
+        "artist_image_link": artist.image_link,
+        "start_time": str(show.start_time)
+      }
+      
+      if show.start_time > datetime.utcnow():
+        upcoming_shows.append(artist)
+      else: past_shows.append(artist)
+
     record = {
       'id': venue.id,
       'name': venue.name,
@@ -263,7 +280,12 @@ def show_venue(venue_id):
       'facebook_link': venue.facebook_link,
       "seeking_talent": venue.seeking_talent,
       "seeking_description": venue.seeking_description,
-      "image_link": venue.image_link
+      "image_link": venue.image_link,
+      "upcoming_shows": upcoming_shows,
+      "past_shows": past_shows,
+      "past_shows_count": len(past_shows),
+      "upcoming_shows_count": len(upcoming_shows),
+
     }
     data_array.append(record)
 
@@ -278,7 +300,7 @@ def create_venue_form():
   form = VenueForm()
   return render_template('forms/new_venue.html', form=form)
 
-@app.route('/venues/create', methods=['POST']) #fertig
+@app.route('/venues/create', methods=['POST']) #completed
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
     data = {}
@@ -330,7 +352,7 @@ def create_venue_submission():
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     
 
-@app.route('/venues/<venue_id>', methods=['DELETE']) #fertig
+@app.route('/venues/<venue_id>', methods=['DELETE']) #completed
 def delete_venue(venue_id):
   delete_venue = Venue.query.filter_by(id=venue_id).first()
   try:
@@ -351,7 +373,7 @@ def delete_venue(venue_id):
 
 #  Artists
 #  ----------------------------------------------------------------
-@app.route('/artists') #fertig
+@app.route('/artists') #completed
 def artists():
   # TODO: replace with real data returned from querying the database
   data=[]
@@ -380,7 +402,7 @@ def search_artists():
   }
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
-@app.route('/artists/<int:artist_id>') #fertig aber shows fehlt
+@app.route('/artists/<int:artist_id>') #completed
 def show_artist(artist_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
@@ -457,9 +479,25 @@ def show_artist(artist_id):
   }
 
   data_array = []
-
+  
   artists = Artist.query.all()
   for artist in artists:
+    #get every artist, join the venue information to the show information for this artist
+    upcoming_shows = []
+    past_shows = []
+    shows = db.session.query(Show, Venue).join(Venue).filter(Show.artist_id == artist.id).all()
+    for show, venue in shows:
+      venue = {
+        "venue_id": venue.id,
+        "venue_name": venue.name,
+        "venue_image_link": venue.image_link,
+        "start_time": str(show.start_time)
+      }
+      
+      if show.start_time > datetime.utcnow():
+        upcoming_shows.append(venue)
+      else: past_shows.append(venue)
+      
     record = {
       'id': artist.id,
       'name': artist.name,
@@ -471,7 +509,11 @@ def show_artist(artist_id):
       'facebook_link': artist.facebook_link,
       "seeking_venue": artist.seeking_venue,
       "seeking_description": artist.seeking_description,
-      "image_link": artist.image_link
+      "image_link": artist.image_link,
+      "upcoming_shows": upcoming_shows,
+      "past_shows": past_shows,
+      "past_shows_count": len(past_shows),
+      "upcoming_shows_count": len(upcoming_shows)
     }
     data_array.append(record)
 
