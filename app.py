@@ -113,23 +113,32 @@ def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
 
-  
   data = []
   
   areas = Venue.query.distinct('city','state').all()
   for area in areas:
     venues_filter = Venue.query.filter(Venue.state==area.state,Venue.city==area.city).all()
     venues = []
-    for venue in venues_filter:
-      venues.append({'id': venue.id, 'name': venue.name})
-
-      record = {
-        'state': area.state,
-        'city': area.city,
-        'venues': venues
-      }
     
+    for venue in venues_filter:
+      join = db.session.query(Venue, Show).join(Show).filter(Venue.id==venue.id).all()
+      
+        
+    
+      venues.append({
+        'id': venue.id, 
+        'name': venue.name,
+        'num_upcoming_shows': len(join)
+        })
+
+    record = {
+      'state': area.state,
+      'city': area.city,
+      'venues': venues
+    }
+
     data.append(record)
+    print(data)
     
   return render_template('pages/venues.html', areas=data)
 
