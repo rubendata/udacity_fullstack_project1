@@ -585,8 +585,23 @@ def edit_artist_submission(artist_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-  form = VenueForm()
-  venue={
+  venue = Venue.query.filter_by(id=venue_id).first()
+  form = VenueForm(
+    name=venue.name,
+    state=venue.state,
+    city=venue.city,
+    address=venue.address,
+    phone=venue.phone,
+    genres=venue.genres,
+    facebook_link=venue.facebook_link,
+    image_link=venue.image_link,
+    website=venue.website,
+    seeking_talent=venue.seeking_talent,
+    seeking_description=venue.seeking_description
+    )
+  
+  
+  venue_old={
     "id": 1,
     "name": "The Musical Hop",
     "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
