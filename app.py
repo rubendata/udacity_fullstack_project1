@@ -454,14 +454,14 @@ def create_shows():
 @app.route('/shows/create', methods=['POST']) #completed
 def create_show_submission():
   try:
-    venue_id = request.get_json()['venue_id']
-    artist_id = request.get_json()['artist_id']
-    start_time = request.get_json()['start_time']
-    show = Show(venue_id=venue_id, artist_id=artist_id, start_time=start_time)
+    form = ShowForm(request.form)
+    show = Show()
+    form.populate_obj(show)
     db.session.add(show)
     db.session.commit()
     flash('show created successfully')
-  except Exception:
+  except Exception as e:
+    print(e)
     print(sys.exc_info())
     flash('An error occurred. Show could not be listed.')
     db.session.rollback()
