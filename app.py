@@ -43,7 +43,7 @@ class Venue(db.Model):
     state = db.Column(db.String(120))
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(500))
+    genres = db.Column(db.ARRAY(db.String), nullable=False)
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website = db.Column(db.String(120))
@@ -61,7 +61,7 @@ class Artist(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
+    genres = db.Column(db.ARRAY(db.String), nullable=False)
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website = db.Column(db.String(120))
@@ -256,44 +256,44 @@ def show_venue(venue_id):
 
   data_array = []
 
-  venues = Venue.query.all()
-  for venue in venues:
-    #get every artist, join the venue information to the show information for this artist
-    upcoming_shows = []
-    past_shows = []
-    shows = db.session.query(Show, Artist).join(Artist).filter(Show.venue_id == venue.id).all()
-    for show, artist in shows:
-      artist = {
-        "artist_id": artist.id,
-        "artist_name": artist.name,
-        "artist_image_link": artist.image_link,
-        "start_time": str(show.start_time)
-      }
-      
-      if show.start_time > datetime.utcnow():
-        upcoming_shows.append(artist)
-      else: past_shows.append(artist)
+  venue = Venue.query.filter_by(id=venue_id).first()
 
-    record = {
-      'id': venue.id,
-      'name': venue.name,
-      'genres': venue.genres,
-      'address': venue.address,
-      'city': venue.city,
-      'state': venue.state,
-      'phone': venue.phone,
-      'website': venue.website,
-      'facebook_link': venue.facebook_link,
-      "seeking_talent": venue.seeking_talent,
-      "seeking_description": venue.seeking_description,
-      "image_link": venue.image_link,
-      "upcoming_shows": upcoming_shows,
-      "past_shows": past_shows,
-      "past_shows_count": len(past_shows),
-      "upcoming_shows_count": len(upcoming_shows),
-
+  #get every artist, join the venue information to the show information for this artist
+  upcoming_shows = []
+  past_shows = []
+  shows = db.session.query(Show, Artist).join(Artist).filter(Show.venue_id == venue.id).all()
+  for show, artist in shows:
+    artist = {
+      "artist_id": artist.id,
+      "artist_name": artist.name,
+      "artist_image_link": artist.image_link,
+      "start_time": str(show.start_time)
     }
-    data_array.append(record)
+    
+    if show.start_time > datetime.utcnow():
+      upcoming_shows.append(artist)
+    else: past_shows.append(artist)
+  
+  record = {
+    'id': venue.id,
+    'name': venue.name,
+    'genres': venue.genres,
+    'address': venue.address,
+    'city': venue.city,
+    'state': venue.state,
+    'phone': venue.phone,
+    'website': venue.website,
+    'facebook_link': venue.facebook_link,
+    "seeking_talent": venue.seeking_talent,
+    "seeking_description": venue.seeking_description,
+    "image_link": venue.image_link,
+    "upcoming_shows": upcoming_shows,
+    "past_shows": past_shows,
+    "past_shows_count": len(past_shows),
+    "upcoming_shows_count": len(upcoming_shows),
+
+  }
+  data_array.append(record)
 
   data = list(filter(lambda d: d['id'] == venue_id, data_array))[0]
   return render_template('pages/show_venue.html', venue=data)
@@ -586,6 +586,7 @@ def edit_artist_submission(artist_id):
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
   venue = Venue.query.filter_by(id=venue_id).first()
+  
   form = VenueForm(
     name=venue.name,
     state=venue.state,
