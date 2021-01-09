@@ -12,6 +12,7 @@ from datetime import datetime
 from flask import render_template, request, Response, flash, redirect, url_for
 from models import *
 from forms import *
+import sys
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -194,7 +195,8 @@ def create_venue_submission():
       data["image_link"] = venue.seeking_talent
       data["image_link"] = venue.seeking_description
       flash('venue created successully')
-    except:
+    except Exception:
+      print(sys.exc_info())
       db.session.rollback()
       flash('something went wrong')
     finally:
@@ -210,7 +212,8 @@ def delete_venue(venue_id):
   try:
     db.session.delete(delete_venue)
     db.session.commit()
-  except:
+  except Exception:
+    print(sys.exc_info())
     db.session.rollback()
   finally:
     db.session.close()
@@ -327,7 +330,6 @@ def edit_artist(artist_id):
     seeking_description=artist.seeking_description
     )
   
-  # TODO: populate form with fields from artist with ID <artist_id>
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST']) #completed
@@ -346,15 +348,15 @@ def edit_artist_submission(artist_id):
       artist.seeking_description = request.get_json()['seeking_description']
             
       db.session.commit()
-      flash('message')
-      print("everything fine")
-    except:
-      print("something went wrong")
-      db.session.rollback()
-    finally:
+      flash('Artist edited successfully')
       
+    except Exception:
+      print(sys.exc_info())
+      db.session.rollback()
+      flash('something went wrong')
+    finally:
       db.session.close()
-      flash('message')
+      
     return redirect(url_for('show_artist', artist_id=artist_id))
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET']) #completed
@@ -396,11 +398,13 @@ def edit_venue_submission(venue_id):
             
       db.session.commit()
       flash('venue edited')
-    except:
+    except Exception:
+      print(sys.exc_info())
       db.session.rollback()
+      flash('something went wrong')
     finally:
       db.session.close()
-      flash('something went wrong')
+      
     return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
@@ -444,7 +448,8 @@ def create_artist_submission():
       data["seeking_venue"] = artist.seeking_venue
       data["seeking_description"] = artist.seeking_description
       flash('Artist ' + request.form['name'] + ' was successfully listed!')
-    except:
+    except Exception:
+      print(sys.exc_info())
       db.session.rollback()
       flash('An error occurred. Artist ' + artist.name + ' could not be listed.')
     finally:
@@ -491,7 +496,8 @@ def create_show_submission():
     db.session.add(show)
     db.session.commit()
     flash('show created successfully')
-  except:
+  except Exception:
+    print(sys.exc_info())
     flash('An error occurred. Show could not be listed.')
     db.session.rollback()
   finally:
