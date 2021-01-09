@@ -2,7 +2,7 @@
 {% block title %}New Artist{% endblock %}
 {% block content %}
   <div class="form-wrapper">
-    <form class="form" id="form">
+    <form class="form" id="form" method="POST">
       <h3 class="form-heading">List artist <em>{{ artist.name }}</em></h3>
       <div class="form-group">
         <label for="name">Name</label>
@@ -52,46 +52,4 @@
       <input type="submit" value="Edit Artist" class="btn btn-primary btn-lg btn-block">
     </form>
   </div>
-  <script>
-       //Create new artist 
-       document.getElementById("form").onsubmit = (e) =>{
-          //get multiple select for genres
-          const genresSelect = document.getElementById("genres").selectedOptions
-          const genres = []
-          for (i of genresSelect) {
-            genres.push(i.value)
-          }
-          //convert seeking_venue into boolean
-          let seeking_venue = document.getElementById("seeking_venue").value;
-          (seeking_venue == "Yes") ? seeking_venue=true : seeking_venue=false;
-          //action
-          e.preventDefault();
-          fetch("/artists/"+"{{ artist.id }}"+"/edit",{
-                method:"POST",
-                body:JSON.stringify({
-                    "name": document.getElementById("name").value,
-                    "city": document.getElementById("city").value,
-                    "state": document.getElementById("state").value,
-                    "phone": document.getElementById("phone").value,
-                    "genres": genres,
-                    "facebook": document.getElementById("facebook_link").value,
-                    "image_link": document.getElementById("image_link").value,
-                    "website": document.getElementById("website").value,
-                    "seeking_venue": seeking_venue,
-                    "seeking_description": document.getElementById("seeking_description").value
-                  
-                }),
-                headers:{
-                    "Content-Type":"application/json"
-                }
-              }
-            )
-            .then((response)=>{
-                  return response
-            })
-            .catch((error)=>
-            console.log(error)
-            )
-    }
-  </script>
 {% endblock %}

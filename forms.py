@@ -234,12 +234,9 @@ class ArtistForm(Form):
         'website', validators=[URL()]
     )
 
-    seeking_venue = SelectField(
+    seeking_venue = BooleanField(
         'seeking_venue', validators=[DataRequired()],
-        choices=[
-            ('Yes', 'Yes'),
-            ('No', 'No'),
-            ]
+        
     )
 
     seeking_description = StringField(
