@@ -557,33 +557,56 @@ def show_artist(artist_id):
 
 #  Update
 #  ----------------------------------------------------------------
-@app.route('/artists/<int:artist_id>/edit', methods=['GET'])
+@app.route('/artists/<int:artist_id>/edit', methods=['GET']) #completed
 def edit_artist(artist_id):
-  form = ArtistForm()
-  artist={
-    "id": 4,
-    "name": "Guns N Petals",
-    "genres": ["Rock n Roll"],
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "326-123-5000",
-    "website": "https://www.gunsnpetalsband.com",
-    "facebook_link": "https://www.facebook.com/GunsNPetals",
-    "seeking_venue": True,
-    "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-    "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
-  }
+  artist = Artist.query.filter_by(id=artist_id).first()
+  
+  form = ArtistForm(
+    name=artist.name,
+    state=artist.state,
+    city=artist.city,
+    phone=artist.phone,
+    genres=artist.genres,
+    facebook_link=artist.facebook_link,
+    image_link=artist.image_link,
+    website=artist.website,
+    seeking_venue=artist.seeking_venue,
+    seeking_description=artist.seeking_description
+    )
+  
   # TODO: populate form with fields from artist with ID <artist_id>
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
-@app.route('/artists/<int:artist_id>/edit', methods=['POST'])
+@app.route('/artists/<int:artist_id>/edit', methods=['POST']) #completed
 def edit_artist_submission(artist_id):
   # TODO: take values from the form submitted, and update existing
   # artist record with ID <artist_id> using the new attributes
+    artist = Artist.query.filter_by(id=artist_id).first()
+    try:
+      artist.name = request.get_json()['name']
+      artist.city = request.get_json()['city']
+      artist.state = request.get_json()['state']
+      artist.phone = request.get_json()['phone']
+      artist.genres = request.get_json()['genres']
+      artist.facebook_link = request.get_json()['facebook']
+      artist.image_link = request.get_json()['image_link']
+      artist.website = request.get_json()['website']
+      artist.seeking_venue = request.get_json()['seeking_venue']
+      artist.seeking_description = request.get_json()['seeking_description']
+            
+      db.session.commit()
+      flash('message')
+      print("everything fine")
+    except:
+      print("something went wrong")
+      db.session.rollback()
+    finally:
+      
+      db.session.close()
+      flash('message')
+    return redirect(url_for('show_artist', artist_id=artist_id))
 
-  return redirect(url_for('show_artist', artist_id=artist_id))
-
-@app.route('/venues/<int:venue_id>/edit', methods=['GET'])
+@app.route('/venues/<int:venue_id>/edit', methods=['GET']) #completed
 def edit_venue(venue_id):
   venue = Venue.query.filter_by(id=venue_id).first()
   
@@ -619,11 +642,32 @@ def edit_venue(venue_id):
   # TODO: populate form with values from venue with ID <venue_id>
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
-@app.route('/venues/<int:venue_id>/edit', methods=['POST'])
+@app.route('/venues/<int:venue_id>/edit', methods=['POST']) #completed
 def edit_venue_submission(venue_id):
   # TODO: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
-  return redirect(url_for('show_venue', venue_id=venue_id))
+    venue = Venue.query.filter_by(id=venue_id).first()
+    try:
+      venue.name = request.get_json()['name']
+      venue.city = request.get_json()['city']
+      venue.state = request.get_json()['state']
+      venue.address = request.get_json()['address']
+      venue.phone = request.get_json()['phone']
+      venue.genres = request.get_json()['genres']
+      venue.facebook_link = request.get_json()['facebook']
+      venue.image_link = request.get_json()['image_link']
+      venue.website = request.get_json()['website']
+      venue.seeking_talent = request.get_json()['seeking_talent']
+      venue.seeking_description = request.get_json()['seeking_description']
+            
+      db.session.commit()
+      flash('message')
+    except:
+      db.session.rollback()
+    finally:
+      db.session.close()
+      flash('message')
+    return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
 #  ----------------------------------------------------------------
@@ -641,7 +685,6 @@ def create_artist_submission():
       name = request.get_json()['name']
       city = request.get_json()['city']
       state = request.get_json()['state']
-      #address = request.get_json()['address']
       phone = request.get_json()['phone']
       genres = request.get_json()['genres']
       facebook_link = request.get_json()['facebook']

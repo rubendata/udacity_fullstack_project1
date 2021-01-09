@@ -71,7 +71,7 @@
       let seeking_talent = document.getElementById("seeking_talent").value;
       (seeking_talent == "Yes") ? seeking_talent=true : seeking_talent=false;
             e.preventDefault();
-            fetch("/venues/create",{
+            fetch("/venues/"+"{{ venue.id }}"+"/edit",{
                 method:"POST",
                 body:JSON.stringify({
                     "name": document.getElementById("name").value,
