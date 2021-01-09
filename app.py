@@ -146,21 +146,24 @@ def search_venues():
 
   search_term = request.form.get('search_term', '')
   search_query = db.session.query(Venue).filter(Venue.name.like('%'+search_term+'%')).all()
-  venue_id = search_query[0].id
-  join = db.session.query(Venue, Show).join(Show).filter(Venue.id == venue_id).all()
   
   data=[]
+  
   num_upcoming_shows = 0
-  for venue, show in join:
-    if show.start_time > datetime.utcnow():
-      num_upcoming_shows += 1
-  print(num_upcoming_shows)
-  record = {
-    "id": venue.id,
-    "name": venue.name,
-    "num_upcoming_shows": num_upcoming_shows
-  }
-  data.append(record)
+  for venue in search_query:
+    join = db.session.query(Venue, Show).join(Show).filter(Venue.id == venue.id).all()
+    
+    for venue, show in join:
+      if show.start_time > datetime.utcnow():
+        num_upcoming_shows += 1
+      
+    record = {
+      "id": venue.id,
+      "name": venue.name,
+      "num_upcoming_shows": num_upcoming_shows
+    }
+    
+    data.append(record)
 
   response={
     "count": len(search_query),
@@ -345,7 +348,8 @@ def create_venue_submission():
       db.session.close()
       flash('message')
     flash('message')
-    return render_template('pages/home.html')
+    #return render_template('pages/home.html')
+    return redirect(url_for("index"))
   # TODO: modify data to be the data object returned from db insertion
   
     # on successful db insert, flash success
@@ -390,12 +394,40 @@ def artists():
     
   return render_template('pages/artists.html', artists=data)
 
-@app.route('/artists/search', methods=['POST'])
+@app.route('/artists/search', methods=['POST']) #completed
 def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
+  
+  search_term = request.form.get('search_term', '')
+  search_query = db.session.query(Artist).filter(Artist.name.like('%'+search_term+'%')).all()
+  
+  data=[]
+  
+  num_upcoming_shows = 0
+  for artist in search_query:
+    join = db.session.query(Artist, Show).join(Show).filter(Artist.id == artist.id).all()
+    
+    for artist, show in join:
+      if show.start_time > datetime.utcnow():
+        num_upcoming_shows += 1
+      
+    record = {
+      "id": artist.id,
+      "name": artist.name,
+      "num_upcoming_shows": num_upcoming_shows
+    }
+    
+    data.append(record)
+
   response={
+    "count": len(search_query),
+    "data": data
+  }
+
+  
+  response_old={
     "count": 1,
     "data": [{
       "id": 4,
