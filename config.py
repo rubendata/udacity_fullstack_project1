@@ -8,7 +8,7 @@ DEBUG = True
 FLASK_DEBUG=True
 FLASK_ENV='development'
 ENV='development'
-SQL_ALCHEMY_TRACK_MODIFICATIONS=False
+SQLALCHEMY_TRACK_MODIFICATIONS=False
 
 # Connect to the database
 

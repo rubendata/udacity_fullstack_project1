@@ -14,6 +14,8 @@ from models import *
 from forms import *
 import sys
 
+
+app.config.from_object('config')
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -162,47 +164,24 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST']) #completed
 def create_venue_submission():
-    data = {}
+    
+    form = VenueForm(request.form)
+    
     try:
-      name = request.get_json()['name']
-      city = request.get_json()['city']
-      state = request.get_json()['state']
-      address = request.get_json()['address']
-      phone = request.get_json()['phone']
-      genres = request.get_json()['genres']
-      facebook_link = request.get_json()['facebook']
-      image_link = request.get_json()['image_link']
-      website = request.get_json()['website']
-      seeking_talent = request.get_json()['seeking_talent']
-      seeking_description = request.get_json()['seeking_description']
-      venue = Venue(
-        name=name, city=city, state=state, address=address, phone = phone, 
-        genres = genres, facebook_link = facebook_link, image_link=image_link, website=website,
-        seeking_talent=seeking_talent, seeking_description=seeking_description
-      )
-      
+      venue = Venue()
+      form.populate_obj(venue)
       db.session.add(venue)
       db.session.commit()
-      data["name"] = venue.name
-      data["city"] = venue.city
-      data["state"] = venue.state
-      data["address"] = venue.address
-      data["phone"] = venue.phone
-      data["genres"] = venue.genres
-      data["facebook_link"] = venue.facebook
-      data["image_link"] = venue.image_link
-      data["website"] = venue.website
-      data["image_link"] = venue.seeking_talent
-      data["image_link"] = venue.seeking_description
-      flash('venue created successully')
+      
+      flash('Venue created successully')
     except Exception:
       print(sys.exc_info())
       db.session.rollback()
-      flash('something went wrong')
+      flash('Something went wrong')
     finally:
       db.session.close()
       
-    return redirect(url_for("index"))
+    return redirect("/venues")
   
     
 
@@ -383,22 +362,26 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
  
     venue = Venue.query.filter_by(id=venue_id).first()
+    
+    form = VenueForm(request.form)
+    
     try:
-      venue.name = request.get_json()['name']
-      venue.city = request.get_json()['city']
-      venue.state = request.get_json()['state']
-      venue.address = request.get_json()['address']
-      venue.phone = request.get_json()['phone']
-      venue.genres = request.get_json()['genres']
-      venue.facebook_link = request.get_json()['facebook']
-      venue.image_link = request.get_json()['image_link']
-      venue.website = request.get_json()['website']
-      venue.seeking_talent = request.get_json()['seeking_talent']
-      venue.seeking_description = request.get_json()['seeking_description']
+      venue.name = form['name'].data
+      venue.city = form['city'].data
+      venue.state = form['state'].data
+      venue.address = form['address'].data
+      venue.phone = form['phone'].data
+      venue.genres = form['genres'].data
+      venue.facebook_link = form['facebook_link'].data
+      venue.image_link = form['image_link'].data
+      venue.website = form['website'].data
+      venue.seeking_talent = form['seeking_talent'].data
+      venue.seeking_description = form['seeking_description'].data
             
       db.session.commit()
       flash('venue edited')
-    except Exception:
+    except Exception as e:
+      print(e)
       print(sys.exc_info())
       db.session.rollback()
       flash('something went wrong')
