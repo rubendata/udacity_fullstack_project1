@@ -121,11 +121,19 @@ def venues():
     venues = []
     
     for venue in venues_filter:
-      join = db.session.query(Venue, Show).join(Show).filter(Venue.id==venue.id).all()
+      upcoming_shows=0
+      past_shows=0
+      shows = db.session.query(Venue, Show).join(Show).filter(Venue.id==venue.id).all()
+      
+      for venue, show in shows:
+        if show.start_time > datetime.utcnow():
+          upcoming_shows+=1
+        else: past_shows+=1
+
       venues.append({
       'id': venue.id, 
       'name': venue.name,
-      'num_upcoming_shows': len(join)
+      'num_upcoming_shows': upcoming_shows
       })
 
     record = {
